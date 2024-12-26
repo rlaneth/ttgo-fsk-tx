@@ -1,0 +1,6 @@
+#define TTGO_SERIAL_BAUD 115200
+
+#define TX_FREQ_DEFAULT 916.0
+#define TX_BITRATE 1.6
+#define TX_DEVIATION 5
+#define TX_POWER_DEFAULT 2
