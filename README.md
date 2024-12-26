@@ -31,9 +31,10 @@ following commands are available:
 
 - `m <length>`: Transmit binary data of specified length in bytes
   - Example: `m 8` prepares to transmit 8 bytes
+  - Maximum length is 2048 bytes
   - After entering this command, send the binary data immediately
   - The terminal will wait until it receives the specified number of bytes, then
-    transmit it immediately
+    transmit it
 
 ### Notes
 
