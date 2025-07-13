@@ -1,2 +1,55 @@
-.pio
-.vscode
+# Compiled object files and binaries
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.a
+*.lib
+
+# C/C++ build directories
+/build/
+/bin/
+/Debug/
+/Release/
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+*.py.class
+
+# Python virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# PlatformIO
+.pio/
+
+# Misc
+*.log
+*.tmp
+*.bak
+*.dSYM/
+*.DS_Store# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*.pyo
