@@ -4,3 +4,5 @@
 #define TX_BITRATE 1.6
 #define TX_DEVIATION 5
 #define TX_POWER_DEFAULT 2
+#define RX_BANDWIDTH 10.4
+#define PREAMBLE_LENGTH 0
