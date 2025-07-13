@@ -1,47 +1,106 @@
-# ttgo-fsk-tx
+# TTGO FSK Transmitter
 
-A simple FSK transmitter firmware for the TTGO LoRa32-OLED v2.1.6 board. This
-project provides an interactive terminal interface to control FSK transmission
-parameters and send binary data.
+FSK transmitter firmware for TTGO LoRa32-OLED v2.1.6 board with serial
+control interface.
 
-## Default Parameters
+## Build
 
-- Modulation: FSK
-- Frequency: 916 MHz
-- Frequency Deviation: 5 kHz
-- Baud Rate: 1600
-- TX Power: 2 dBm
+PlatformIO project for ESP32 target:
 
-Set in [defaults.h](src/defaults.h).
+```bash
+pio run                              # Build firmware
+pio run --target upload             # Upload to device
+pio run --target monitor            # Serial monitor
+```
 
-## Serial Interface
+## Configuration
 
-The firmware exposes a terminal interface over serial at 115200 baud. The
-following commands are available:
+Default parameters in [src/defaults.h](src/defaults.h):
+
+| Parameter | Value | Runtime Config |
+|-----------|-------|----------------|
+| Frequency | 916.0 MHz | Yes |
+| TX Power | 2 dBm | Yes |
+| Modulation | FSK | No |
+| Deviation | 5.0 kHz | No |
+| Bit Rate | 1600 bps | No |
+| Serial Baud | 115200 | No |
+
+## Serial Protocol
+
+115200 baud, newline-terminated commands. Response format:
+
+```
+PREFIX:CODE:MESSAGE
+```
+
+- PREFIX: Message source (CONSOLE, TX, LO)
+- CODE: 0=success, non-zero=error
+- MESSAGE: Status text
 
 ### Commands
 
-- `f <frequency>`: Set the transmit frequency in MHz
+#### `f <MHz>` - Set Frequency
+```
+> f 433.5
+< CONSOLE:0:Frequency set to 433.5000
+```
 
-  - Example: `f 915.5` sets frequency to 915.5 MHz
+#### `p <dBm>` - Set Power (2-17 dBm)
+```
+> p 10
+< CONSOLE:0:Transmit power set to 10
+```
 
-- `p <power>`: Set the transmit power in dBm
+#### `m <bytes>` - Transmit Data (1-2048 bytes)
+```
+> m 5
+< CONSOLE:0:Waiting for 5 bytes
+(send binary data)
+< CONSOLE:0:Accepted 5 bytes
+< TX:0:Transmission finished successfully!
+```
 
-  - Example: `p 15` sets TX power to 15 dBm
+### Error Responses
+```
+CONSOLE:1:Failed to set frequency
+CONSOLE:9:Unknown command
+TX:1:Transmission failed to start, error code: -2
+```
 
-- `m <length>`: Transmit binary data of specified length in bytes
-  - Example: `m 8` prepares to transmit 8 bytes
-  - Maximum length is 2048 bytes
-  - After entering this command, send the binary data immediately
-  - The terminal will wait until it receives the specified number of bytes, then
-    transmit it
+## Transmission Flow
 
-### Notes
+1. Send `m <size>` command
+2. Wait for `CONSOLE:0:Waiting for N bytes`
+3. Send N bytes of binary data
+4. Wait for `CONSOLE:0:Accepted N bytes`
+5. Wait for `TX:0:Transmission finished successfully!`
 
-- Frequency and TX power can be adjusted dynamically through the terminal
-- Other parameters (deviation, baud rate) are fixed and cannot be modified
-  without rebuilding the firmware
-- The terminal will block while waiting for binary data after the `m` command
+Device automatically starts transmission after accepting data.
+
+## Python Example
+
+Located in `examples/send_fsk/`. Implements complete protocol with error
+handling and device reset on timeout.
+
+### Setup
+```bash
+cd examples/send_fsk
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Usage
+```bash
+python main.py /dev/ttyUSB0 file.bin
+python main.py /dev/ttyUSB0 file.bin -f 433.5 -p 10 -v
+```
+
+The script validates response codes and message prefixes, distinguishing
+between CONSOLE responses (parameter setting, data acceptance) and TX
+responses (transmission completion). Automatic device reset occurs on
+communication failures or timeouts.
 
 ## License
 
