@@ -11,13 +11,13 @@ extern Radio radio;
 extern volatile bool console_loop_enable;
 extern volatile bool fifo_empty;
 
-extern uint8_t tx_data[2048];
-extern int tx_length;
-extern int tx_remain;
-extern int16_t tx_state;
+extern uint8_t tx_data_buffer[2048];
+extern int current_tx_total_length;
+extern int current_tx_remaining_length;
+extern int16_t radio_start_transmit_status;
 
-extern float tx_frequency;
-extern float tx_power;
+extern float current_tx_frequency;
+extern float current_tx_power;
 
 String await_read_line()
 {
@@ -43,7 +43,7 @@ void console_loop()
 
     if (line.length() < 3 || line[1] != ' ')
     {
-        Serial.println("__:9:Unknown command");
+        Serial.println("CONSOLE:9:Unknown command");
         return;
     }
 
@@ -58,14 +58,14 @@ void console_loop()
 
         if (state != RADIOLIB_ERR_NONE)
         {
-            Serial.println("__:1:Failed to set frequency");
+            Serial.println("CONSOLE:1:Failed to set frequency");
             return;
         }
 
-        Serial.print("__:0:Frequency set to ");
+        Serial.print("CONSOLE:0:Frequency set to ");
         Serial.println(freq, 4);
 
-        tx_frequency = freq;
+        current_tx_frequency = freq;
         display_status();
 
         break;
@@ -78,14 +78,14 @@ void console_loop()
 
         if (state != RADIOLIB_ERR_NONE)
         {
-            Serial.println("__:1:Failed to set transmit power");
+            Serial.println("CONSOLE:1:Failed to set transmit power");
             return;
         }
 
-        Serial.print("__:0:Transmit power set to ");
+        Serial.print("CONSOLE:0:Transmit power set to ");
         Serial.println(power);
 
-        tx_power = power;
+        current_tx_power = power;
         display_status();
 
         break;
@@ -97,33 +97,34 @@ void console_loop()
 
         if (bytes_to_read < 1)
         {
-            Serial.println("__:9:Invalid parameter");
+            Serial.println("CONSOLE:9:Invalid parameter");
             break;
         }
 
         if (bytes_to_read > 2048)
             bytes_to_read = 2048;
 
-        Serial.print("__:0:Waiting for ");
+        Serial.print("CONSOLE:0:Waiting for ");
         Serial.print(bytes_to_read);
         Serial.println(" bytes");
 
-        tx_length = 0;
-        while (tx_length < bytes_to_read)
+        current_tx_total_length = 0;
+        while (current_tx_total_length < bytes_to_read)
         {
             if (Serial.available())
             {
-                tx_data[tx_length++] = Serial.read();
+                tx_data_buffer[current_tx_total_length++] = Serial.read();
             }
         }
 
-        Serial.print("__:0:Accepted ");
-        Serial.print(tx_length);
+        Serial.print("CONSOLE:0:Accepted ");
+        Serial.print(current_tx_total_length);
         Serial.println(" bytes");
 
+        fifo_empty = true;
         console_loop_enable = false;
-        tx_remain = tx_length;
-        tx_state = radio.startTransmit(tx_data, tx_length);
+        current_tx_remaining_length = current_tx_total_length;
+        radio_start_transmit_status = radio.startTransmit(tx_data_buffer, current_tx_total_length);
 
         display_status();
 
@@ -131,6 +132,6 @@ void console_loop()
     }
 
     default:
-        Serial.println("__:9:Unknown command");
+        Serial.println("CONSOLE:9:Unknown command");
     }
 }

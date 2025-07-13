@@ -9,8 +9,8 @@
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
 
 extern volatile bool console_loop_enable;
-extern float tx_frequency;
-extern float tx_power;
+extern float current_tx_frequency;
+extern float current_tx_power;
 
 void display_panic()
 {
@@ -41,9 +41,9 @@ void display_status()
 {
 
     String tx_power_str = "+";
-    String tx_frequency_str = String(tx_frequency, 4);
+    String tx_frequency_str = String(current_tx_frequency, 4);
 
-    tx_power_str.concat(String(tx_power, 0));
+    tx_power_str.concat(String(current_tx_power, 0));
     tx_power_str.concat(" dBm");
     tx_frequency_str.concat(" MHz");
 
