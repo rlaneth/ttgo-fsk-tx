@@ -6,22 +6,12 @@ This script provides a robust interface for transmitting binary files over FSK
 using the serial interface of ttgo-fsk-tx firmware. It supports configuration
 of transmission parameters and includes comprehensive error handling.
 
-Features:
-    - Configurable frequency and transmit power
-    - Binary file transmission up to 2048 bytes
-    - Automatic device reset on timeout
-    - Comprehensive error handling and validation
-    - Performance-optimized serial communication
-
 Protocol:
     Device responses follow format: XX:N:S where N=0 indicates success
     Commands:
         f <freq>   - Set frequency in MHz
         p <power>  - Set transmit power in dBm (2-17)
         m <length> - Transmit binary data of specified length
-
-Author: Generated for TTGO FSK transmitter project
-Version: 2.0
 """
 
 from __future__ import annotations
