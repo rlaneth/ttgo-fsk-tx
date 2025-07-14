@@ -8,7 +8,7 @@ control interface.
 PlatformIO project for ESP32 target:
 
 ```bash
-pio run                              # Build firmware
+pio run                             # Build firmware
 pio run --target upload             # Upload to device
 pio run --target monitor            # Serial monitor
 ```
